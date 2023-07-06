@@ -1,0 +1,43 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu:20.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build production-ready React app
+        run: npm run build
+
+      - name: Build Docker image
+        run: |
+          docker build -t react-app .
+          docker tag react-app harshal655/react-app:${{ github.sha }}
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: harshal655
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Push Docker image
+        run: docker push harshal655/react-app:${{ github.sha }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f your-kubernetes-manifest.yaml
