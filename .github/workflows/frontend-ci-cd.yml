@@ -40,4 +40,4 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f your-kubernetes-manifest.yaml
+          kubectl apply -f .github/workflows/kubernetes.yaml
